@@ -1,0 +1,89 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+class LightSource {
+  - brightness: double
+  - form: LightForm
+  - color: LightColor
+  - spreadSpeed: double
+
+  + flash(): void
+  + expand(): void
+  + transform(newForm: LightForm): void
+}
+
+class CelestialBody {
+  - intensity: double
+  - flameColor: LightColor
+  - count: int
+
+  + appear(): void
+  + emitRadiation(): void
+  + burnHorizon(h: Horizon): void
+}
+
+class Atmosphere {
+  - density: double
+  - transparency: double
+
+  + transmitLight(): void
+  + scatterLight(): void
+}
+
+class Horizon {
+  - color: String
+  - darknessLevel: double
+
+  + illuminate(): void
+  + burn(): void
+}
+
+class Planet {
+  - illumination: double
+  - surfaceTemperature: double
+  - atmosphereDensity: double
+  - visibleSuns: int
+  - colorEffect: LightColor
+  - type: PlanetType
+
+  + classify(): PlanetType
+  + calculateVisibility(): double
+}
+
+enum LightForm {
+  POINT
+  CRESCENT
+  SUN
+}
+
+enum LightColor {
+  WHITE
+  RED
+  ORANGE
+  MULTICOLOR
+}
+
+enum PlanetType {
+  MERCURY
+  VENUS
+  EARTH
+  MARS
+  JUPITER
+  SATURN
+}
+
+LightSource --> CelestialBody : transforms into suns
+CelestialBody --> Atmosphere : emits light
+Atmosphere --> Horizon : diffuses light
+CelestialBody --> Horizon : burns edge
+
+Horizon --> Planet : illuminates surface
+Atmosphere --> Planet : affects visibility
+CelestialBody --> Planet : heats / lights
+
+LightSource --> LightForm
+CelestialBody --> LightColor
+Planet --> PlanetType
+@enduml

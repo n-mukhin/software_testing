@@ -1,0 +1,3 @@
+mvn -pl task1 test -e
+mvn -pl task2 test -e
+mvn -pl task3 test -e
