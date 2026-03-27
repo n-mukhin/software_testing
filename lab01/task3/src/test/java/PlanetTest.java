@@ -1,81 +1,85 @@
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class PlanetTest {
 
-class PlanetTest {
+    @Test
+    void constructorAndGettersShouldWorkInitially() {
+        Planet planet = new Planet(
+                "Nova",
+                new Orbit(10.0, 0.1),
+                new Atmosphere(0.3, 0.2, 0.21),
+                new Surface(0.25, 0.7),
+                new HabitabilityCalculator()
+        );
 
-    private final PrintStream originalOut = System.out;
-    private ByteArrayOutputStream outContent;
-
-    @BeforeEach
-    void setUp() {
-        outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
+        assertEquals("Nova", planet.getName());
+        assertEquals(0.0, planet.getSurfaceTemperature(), 1e-9);
+        assertEquals(0.0, planet.getRadiationLevel(), 1e-9);
+        assertEquals(0.0, planet.getHabitabilityIndex(), 1e-9);
+        assertNull(planet.getPlanetClass());
+        assertNull(planet.getClimateType());
     }
 
     @Test
-    void shouldClassifyAsMercury() {
-        Planet planet = new Planet(500, 900, 0.2, 1, LightSource.LightColor.WHITE);
-        assertEquals(Planet.PlanetType.MERCURY, planet.getType());
+    void calculateTemperatureShouldUpdateValue() {
+        Planet planet = new Planet(
+                "Nova",
+                new Orbit(2.0, 0.0),
+                new Atmosphere(0.5, 0.2, 0.21),
+                new Surface(0.25, 0.7),
+                new HabitabilityCalculator()
+        );
+
+        double result = planet.calculateTemperature(new Star(1000.0, 50.0));
+
+        assertEquals(result, planet.getSurfaceTemperature(), 1e-9);
     }
 
     @Test
-    void shouldClassifyAsVenus() {
-        Planet planet = new Planet(700, 750, 0.9, 1, LightSource.LightColor.ORANGE);
-        assertEquals(Planet.PlanetType.VENUS, planet.getType());
+    void updateStateShouldSetNonHabitable() {
+        Planet planet = new Planet(
+                "Dead",
+                new Orbit(1.0, 0.0),
+                new Atmosphere(0.1, 0.9, 0.01),
+                new Surface(0.9, 0.01),
+                new HabitabilityCalculator()
+        );
+
+        planet.updateState(new Star(1.0, 1000.0));
+
+        assertEquals(PlanetClass.NON_HABITABLE, planet.getPlanetClass());
     }
 
     @Test
-    void shouldClassifyAsEarth() {
-        Planet planet = new Planet(400, 300, 0.8, 1, LightSource.LightColor.WHITE);
-        assertEquals(Planet.PlanetType.EARTH, planet.getType());
+    void updateStateShouldSetPotentiallyHabitable() {
+        Planet planet = new Planet(
+                "Mid",
+                new Orbit(5000.0, 0.0),
+                new Atmosphere(0.0, 1.0, 1.0),
+                new Surface(0.0, 0.6),
+                new HabitabilityCalculator()
+        );
+
+        planet.updateState(new Star(4172762.3854984045, 0.0));
+
+        assertEquals(PlanetClass.POTENTIALLY_HABITABLE, planet.getPlanetClass());
     }
 
     @Test
-    void shouldClassifyAsMars() {
-        Planet planet = new Planet(200, 150, 0.2, 1, LightSource.LightColor.RED);
-        assertEquals(Planet.PlanetType.MARS, planet.getType());
-    }
+    void updateStateShouldSetHabitable() {
+        Planet planet = new Planet(
+                "Eden",
+                new Orbit(5000.0, 0.0),
+                new Atmosphere(0.0, 1.0, 1.0),
+                new Surface(0.0, 1.0),
+                new HabitabilityCalculator()
+        );
 
-    @Test
-    void shouldClassifyAsJupiter() {
-        Planet planet = new Planet(1000, 500, 2.5, 2, LightSource.LightColor.MULTICOLOR);
-        assertEquals(Planet.PlanetType.JUPITER, planet.getType());
-    }
+        planet.updateState(new Star(4172762.3854984045, 0.0));
 
-    @Test
-    void shouldClassifyAsSaturnByDefault() {
-        Planet planet = new Planet(300, 500, 1.0, 1, LightSource.LightColor.ORANGE);
-        assertEquals(Planet.PlanetType.SATURN, planet.getType());
-    }
-
-    @Test
-    void shouldReturnAllPlanetParameters() {
-        Planet planet = new Planet(450, 280, 0.7, 1, LightSource.LightColor.WHITE);
-
-        assertEquals(450, planet.getIllumination());
-        assertEquals(280, planet.getTemperature());
-        assertEquals(0.7, planet.getAtmosphereDensity());
-        assertEquals(1, planet.getVisibleSuns());
-        assertEquals(LightSource.LightColor.WHITE, planet.getColorEffect());
-    }
-
-    @Test
-    void shouldDescribePlanet() {
-        Planet planet = new Planet(400, 300, 0.8, 1, LightSource.LightColor.WHITE);
-
-        planet.describe();
-
-        assertTrue(outContent.toString().contains("Planet type: EARTH"));
+        assertEquals(PlanetClass.HABITABLE, planet.getPlanetClass());
     }
 }
