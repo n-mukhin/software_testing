@@ -1,70 +1,33 @@
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AtmosphereTest {
+public class AtmosphereTest {
 
-    private final PrintStream originalOut = System.out;
-    private ByteArrayOutputStream outContent;
+    @Test
+    void constructorAndGettersShouldWork() {
+        Atmosphere atmosphere = new Atmosphere(0.4, 0.25, 0.21);
 
-    @BeforeEach
-    void setUp() {
-        outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
+        assertEquals(0.4, atmosphere.getDensity());
+        assertEquals(0.25, atmosphere.getTransparency());
+        assertEquals(0.21, atmosphere.getOxygenLevel());
     }
 
     @Test
-    void shouldCreateAtmosphereWithDefaultTransparency() {
-        Atmosphere atmosphere = new Atmosphere(0.3, "Rarefied");
+    void calculateInsulationShouldWork() {
+        Atmosphere atmosphere = new Atmosphere(0.5, 0.2, 0.21);
 
-        assertEquals(0.3, atmosphere.getDensity());
-        assertEquals("Rarefied", atmosphere.getComposition());
-        assertEquals(1.0, atmosphere.getTransparency());
+        double result = atmosphere.calculateInsulation();
+
+        assertEquals(0.4, result, 1e-9);
     }
 
     @Test
-    void shouldCreateAtmosphereWithCustomTransparency() {
-        Atmosphere atmosphere = new Atmosphere(0.8, "Dense", 0.6);
+    void calculateBreathabilityShouldReturnOxygenLevel() {
+        Atmosphere atmosphere = new Atmosphere(0.5, 0.2, 0.18);
 
-        assertEquals(0.8, atmosphere.getDensity());
-        assertEquals("Dense", atmosphere.getComposition());
-        assertEquals(0.6, atmosphere.getTransparency());
-    }
+        double result = atmosphere.calculateBreathability();
 
-    @Test
-    void shouldSetTransparency() {
-        Atmosphere atmosphere = new Atmosphere(0.5, "Mixed");
-        atmosphere.setTransparency(0.4);
-
-        assertEquals(0.4, atmosphere.getTransparency());
-    }
-
-    @Test
-    void shouldTransmitLight() {
-        Atmosphere atmosphere = new Atmosphere(0.3, "Rarefied");
-
-        atmosphere.transmitLight();
-
-        assertTrue(outContent.toString().contains("Atmosphere transmits light."));
-    }
-
-    @Test
-    void shouldScatterLight() {
-        Atmosphere atmosphere = new Atmosphere(0.3, "Rarefied");
-
-        atmosphere.scatterLight();
-
-        assertTrue(outContent.toString().contains("Atmosphere scatters light."));
+        assertEquals(0.18, result, 1e-9);
     }
 }
