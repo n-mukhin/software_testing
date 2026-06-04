@@ -1,0 +1,8 @@
+mvn clean verify -Dconfig=1 && \
+mvn verify -Dconfig=2 && \
+mvn verify -Dconfig=3
+
+mvn verify -Djmeter.test.file=stress-test.jmx -Dconfig=2
+
+jmeter -g results/load-test-2/20260604-load-test.csv \
+-o report

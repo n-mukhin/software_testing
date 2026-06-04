@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: Lower.integration.BaseLINTest
+-------------------------------------------------------------------------------
+Tests run: 31, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.092 s -- in Lower.integration.BaseLINTest
